@@ -1,40 +1,57 @@
 use std::collections::HashSet;
 use crate::blocks::BasicBlock;
+use crate::convert::ConvertIr;
 use crate::module::{CallingConvention, LinkageType};
-use crate::values::Value;
+use crate::values::{RegisterData, Type, Value};
 
 #[derive(Clone, Debug)]
 pub struct Function {
     name: String,
-    attributes: HashSet<FunctionAttribute>,
-    blocks: Vec<BasicBlock>
+    return_type: Type,
+    parameters: Vec<(Type, RegisterData)>,
+    blocks: Vec<BasicBlock>,
+
+    linkage: Option<LinkageType>,
+    calling_convention: Option<CallingConvention>,
 }
 
-#[derive(Eq, Hash, Clone, PartialEq, Debug)]
-pub enum FunctionAttribute {
-    Linkage(LinkageType),
-    CallConv(CallingConvention)
+impl ConvertIr for Function {
+    fn ir(&self) -> String {
+        let blocks = self.blocks.clone();
+        if blocks.is_empty() {
+            format!("declare {} {} @{}()",
+                    self.linkage.clone().map(|x| x.ir()).unwrap_or_else(String::new),
+                           self.return_type.clone().ir(),
+                           self.name.clone())
+        } else {
+            format!("define {} {} @{} {{\n{}\n}}",
+                    self.linkage.clone().map(|x| x.ir()).unwrap_or_else(String::new),
+                    self.return_type.clone().ir(),
+                    self.name.clone(),
+                    blocks.iter().map(|x| x.ir()).collect::<Vec<_>>().join("\n"),
+            )
+        }
+
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
     use crate::blocks::{BasicBlock, Label};
-    use crate::functions::{Function, FunctionAttribute};
+    use crate::convert::ConvertIr;
+    use crate::functions::Function;
     use crate::inst::Instruction;
-    use crate::module::{CallingConvention, LinkageType};
+    use crate::module::{LinkageType};
     use crate::values::{ConstantData, RegisterData, Type, Value};
-    use crate::values::Value::{Constant as ConstantValue, Register as RegisterValue};
 
     #[test]
     fn example_func() {
-        let mut attrs = HashSet::new();
-        attrs.insert(FunctionAttribute::CallConv(CallingConvention::C));
-        attrs.insert(FunctionAttribute::Linkage(LinkageType::Private));
-
         let func = Function {
             name: "main".to_string(),
-            attributes: attrs,
+            return_type: Type::Integer(32),
+            parameters: vec![],
+            linkage: Some(LinkageType::Private),
+            calling_convention: None,
             blocks: vec![
                 BasicBlock {
                     name: Label { name: "entry".to_string() },
@@ -47,5 +64,7 @@ mod tests {
                 }
             ]
         };
+
+        println!("Function:\n{}", func.ir());
     }
 }

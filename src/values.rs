@@ -1,7 +1,15 @@
 use crate::blocks::BasicBlock;
+use crate::convert::ConvertIr;
 
 #[derive(Clone, Debug)]
 pub enum Type {
+    /// The void type does not represent any value and has no size.
+    Void,
+    /// The function type can be thought of as a function signature.
+    /// It consists of a return type and a list of formal parameter types.
+    /// The return type of a function type is a void type or first class type — except for
+    /// label and metadata types.
+    FunctionType(Box<Type>, Vec<Type>),
     /// The integer type is a very simple type that simply specifies an arbitrary bit width for the
     /// integer type desired. Any bit width from 1 bit to 223(about 8 million) can be specified.
     Integer(i32),
@@ -49,10 +57,41 @@ pub enum Type {
     /// The array type is a very simple derived type that arranges elements sequentially in memory.
     Array(Box<Type>),
     /// The structure type is used to represent a collection of data members together in memory.
-    Struct { members: Vec<Type> },
+    Struct(Vec<Type>),
     /// Opaque structure types are used to represent structure types that do not have a body
     /// specified.
     Opaque
+}
+
+impl ConvertIr for Type {
+    fn ir(&self) -> String {
+        match self {
+            Type::Void => "void".to_string(),
+            Type::FunctionType(ty, body) => format!(
+                "{}({})",
+                ty.ir(),
+                body.iter().map(|t| t.ir()).collect::<Vec<_>>().join(", ")
+            ),
+            Type::Integer(i) => format!("i{}", i),
+            Type::Float16 => "half".to_string(),
+            Type::BFloat16 => "bfloat".to_string(),
+            Type::Float32 => "float".to_string(),
+            Type::Float64 => "double".to_string(),
+            Type::X86Float80 => "x86_fp80".to_string(),
+            Type::Float128 => "fp128".to_string(),
+            Type::PPCFloat128 => "ppc_fp128".to_string(),
+            Type::X86AMX => "x86_amx".to_string(),
+            Type::Ptr => "ptr".to_string(),
+            Type::Target => "target(\"label\")".to_string(),
+            Type::Vector { ty, size } => format!("[{} x {}]", ty.ir(), size),
+            Type::Label => "label".to_string(),
+            Type::Token => "token".to_string(),
+            Type::Metadata => "metadata".to_string(),
+            Type::Array(ty) => format!("[{}]", ty.ir()),
+            Type::Struct(body) => format!("struct {}", body.iter().map(|t| t.ir()).collect::<Vec<_>>().join(", ")),
+            Type::Opaque => "opaque".to_string()
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -65,6 +104,17 @@ pub enum Value {
     CString(String),
     /// Represents a constant value
     Constant(ConstantData)
+}
+
+impl ConvertIr for Value {
+    fn ir(&self) -> String {
+        match self {
+            Value::GlobalVariable(g) => g.ir(),
+            Value::Register(r) => r.ir(),
+            Value::Constant(c) => c.ir(),
+            Value::CString(str) => format!("c{:?}", str)
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -106,10 +156,43 @@ pub enum ConstantData {
     BlockAddress(String, String)
 }
 
+impl ConvertIr for ConstantData {
+    fn ir(&self) -> String {
+        match self {
+            ConstantData::True => "true".to_string(),
+            ConstantData::False => "false".to_string(),
+            ConstantData::Integer(i) => i.to_string(),
+            ConstantData::FloatingPoint(f) => f.to_string(),
+            ConstantData::NullPtr => "null".to_string(),
+            ConstantData::StructureConstant(c) => format!(
+                "{{ {} }}",
+                c.iter().map(|x| format!("{} {}", x.0.ir(), x.1.ir())).collect::<Vec<_>>().join(", ")
+            ),
+            ConstantData::ArrayConstant(c) => format!(
+                "[ {} ]",
+                c.iter().map(|x| format!("{} {}", x.0.ir(), x.1.ir())).collect::<Vec<_>>().join(", ")
+            ),
+            ConstantData::VectorConstant(c) => format!(
+                "< {} >",
+                c.iter().map(|x| format!("{} {}", x.0.ir(), x.1.ir())).collect::<Vec<_>>().join(", ")
+            ),
+            ConstantData::Poison => "poison".to_string(),
+            ConstantData::Undef => "undef".to_string(),
+            ConstantData::BlockAddress(str, addr) => format!("blockaddress(@{}, %{})", str, addr)
+        }
+    }
+}
+
 
 #[derive(Clone, Debug)]
 pub struct GlobalPtr {
     pub name: String,
+}
+
+impl ConvertIr for GlobalPtr {
+    fn ir(&self) -> String {
+        format!("@{}", self.name)
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -122,5 +205,11 @@ impl RegisterData {
        RegisterData {
            name: name.to_string()
        }
+    }
+}
+
+impl ConvertIr for RegisterData {
+    fn ir(&self) -> String {
+        format!("%{}", self.name)
     }
 }

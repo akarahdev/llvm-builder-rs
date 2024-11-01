@@ -1,4 +1,5 @@
 use crate::blocks::{BasicBlock, Label};
+use crate::convert::ConvertIr;
 use crate::values::{ConstantData, RegisterData, Type, Value};
 
 #[derive(Clone, Debug)]
@@ -45,6 +46,16 @@ pub enum Instruction {
     Store(Value, Type, Value),
 }
 
+impl ConvertIr for Instruction {
+    fn ir(&self) -> String {
+        match self {
+            Instruction::Ret(t, v) => format!("ret {} {}", t.ir(), v.ir()),
+            Instruction::RetVoid => "ret void".to_string(),
+            Instruction::Alloca(data, ty) => format!("{} = alloca {}", data.ir(), ty.ir()),
+            _ => "TODO".to_string()
+        }
+    }
+}
 #[derive(Clone, Debug)]
 pub struct SwitchBranch {
     ty: Type,
