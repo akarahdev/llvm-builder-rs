@@ -60,15 +60,15 @@ pub enum Value {
     /// A global value, e.g @main
     GlobalVariable(GlobalPtr),
     /// A local register, e.g %2
-    Register(Register),
+    Register(RegisterData),
     /// A raw string, e.g c"Hello world!\00"
     CString(String),
     /// Represents a constant value
-    Constant(Constant)
+    Constant(ConstantData)
 }
 
 #[derive(Clone, Debug)]
-pub enum Constant {
+pub enum ConstantData {
     /// Represents an i1 'true'.
     True,
     /// Represents an i1 'false'.
@@ -113,6 +113,14 @@ pub struct GlobalPtr {
 }
 
 #[derive(Clone, Debug)]
-pub struct Register {
+pub struct RegisterData {
     pub name: String
+}
+
+impl RegisterData {
+    pub fn new(name: &str) -> RegisterData {
+       RegisterData {
+           name: name.to_string()
+       }
+    }
 }
