@@ -52,6 +52,30 @@ impl ConvertIr for Instruction {
             Instruction::Ret(t, v) => format!("ret {} {}", t.ir(), v.ir()),
             Instruction::RetVoid => "ret void".to_string(),
             Instruction::Alloca(data, ty) => format!("{} = alloca {}", data.ir(), ty.ir()),
+            Instruction::Add(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::FAdd(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::Sub(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::FSub(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::Mul(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::FMul(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::SDiv(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::UDiv(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::FDiv(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::SRem(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::URem(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
+            Instruction::FRem(target, ty, lhs, rhs, flags) =>
+                format!("{} = add {}{} {}, {}", target.ir(), flags.ir(), ty.ir(), lhs.ir(), target.ir()),
             _ => "TODO".to_string()
         }
     }
@@ -69,4 +93,15 @@ pub enum ArithmeticFlags {
     NoUnsignedWrap,
     NoSignedWrap,
     NoSignedOrUnsignedWrap
+}
+
+impl ConvertIr for ArithmeticFlags {
+    fn ir(&self) -> String {
+        match self {
+            ArithmeticFlags::WrapAllowed => "".to_string(),
+            ArithmeticFlags::NoUnsignedWrap => "nuw ".to_string(),
+            ArithmeticFlags::NoSignedWrap => "nsw".to_string(),
+            ArithmeticFlags::NoSignedOrUnsignedWrap => "nsw nuw ".to_string()
+        }
+    }
 }
