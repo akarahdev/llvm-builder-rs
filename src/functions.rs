@@ -23,7 +23,7 @@ mod tests {
     use crate::functions::{Function, FunctionAttribute};
     use crate::inst::Instruction;
     use crate::module::{CallingConvention, LinkageType};
-    use crate::values::{Type, Value};
+    use crate::values::{Constant, Type, Value};
 
     #[test]
     fn example_func() {
@@ -38,7 +38,7 @@ mod tests {
                 BasicBlock {
                     name: Label { name: "entry".to_string() },
                     instructions: vec![
-                        Instruction::Ret(Type::Integer(16), Value::Integer(10)),
+                        Instruction::Ret(Type::Integer(16), Value::Constant(Constant::Integer(12))),
                     ],
                 }
             ]

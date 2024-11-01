@@ -1,5 +1,5 @@
 use crate::blocks::{BasicBlock, Label};
-use crate::values::{Type, Value};
+use crate::values::{Register, Type, Value};
 
 #[derive(Clone, Debug)]
 pub enum Instruction {
@@ -7,34 +7,34 @@ pub enum Instruction {
     RetVoid,
 
     Br(Value, Label, Label),
-    Switch { branches: Vec<SwitchBranch> },
+    Switch(Type, Value, Vec<SwitchBranch>),
 
     Unreachable,
 
-    FNeg(Value, Type, Value),
-    Add(Value, Type, Value, Value, ArithmeticFlags),
-    FAdd(Value, Type, Value, Value, ArithmeticFlags),
-    Sub(Value, Type, Value, Value, ArithmeticFlags),
-    FSub(Value, Type, Value, Value, ArithmeticFlags),
-    Mul(Value, Type, Value, Value, ArithmeticFlags),
-    FMul(Value, Type, Value, Value, ArithmeticFlags),
-    UDiv(Value, Type, Value, Value, ArithmeticFlags),
-    SDiv(Value, Type, Value, Value, ArithmeticFlags),
-    FDiv(Value, Type, Value, Value, ArithmeticFlags),
-    URem(Value, Type, Value, Value, ArithmeticFlags),
-    SRem(Value, Type, Value, Value, ArithmeticFlags),
-    FRem(Value, Type, Value, Value, ArithmeticFlags),
+    FNeg(Register, Type, Value),
+    Add(Register, Type, Value, Value, ArithmeticFlags),
+    FAdd(Register, Type, Value, Value, ArithmeticFlags),
+    Sub(Register, Type, Value, Value, ArithmeticFlags),
+    FSub(Register, Type, Value, Value, ArithmeticFlags),
+    Mul(Register, Type, Value, Value, ArithmeticFlags),
+    FMul(Register, Type, Value, Value, ArithmeticFlags),
+    UDiv(Register, Type, Value, Value, ArithmeticFlags),
+    SDiv(Register, Type, Value, Value, ArithmeticFlags),
+    FDiv(Register, Type, Value, Value, ArithmeticFlags),
+    URem(Register, Type, Value, Value, ArithmeticFlags),
+    SRem(Register, Type, Value, Value, ArithmeticFlags),
+    FRem(Register, Type, Value, Value, ArithmeticFlags),
 
-    Shl(Value, Type, Value, Value, ArithmeticFlags),
-    LShr(Value, Type, Value, Value, ArithmeticFlags),
-    AShr(Value, Type, Value, Value, ArithmeticFlags),
+    Shl(Register, Type, Value, Value, ArithmeticFlags),
+    LShr(Register, Type, Value, Value, ArithmeticFlags),
+    AShr(Register, Type, Value, Value, ArithmeticFlags),
 
-    And(Value, Type, Value, Value, ArithmeticFlags),
-    Or(Value, Type, Value, Value, ArithmeticFlags),
-    Xor(Value, Type, Value, Value, ArithmeticFlags),
+    And(Register, Type, Value, Value, ArithmeticFlags),
+    Or(Register, Type, Value, Value, ArithmeticFlags),
+    Xor(Register, Type, Value, Value, ArithmeticFlags),
 
-    ExtractElement(Value, Type, Value, Type, Value),
-    InsertElement(Value, Type, Value, Type, Value),
+    ExtractElement(Register, Type, Value, Type, Value),
+    InsertElement(Register, Type, Value, Type, Value),
 }
 
 #[derive(Clone, Debug)]

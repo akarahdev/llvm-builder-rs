@@ -58,15 +58,17 @@ pub enum Type {
 #[derive(Clone, Debug)]
 pub enum Value {
     /// A global value, e.g @main
-    GlobalVariable(String),
+    GlobalVariable(GlobalPtr),
     /// A local register, e.g %2
-    Register(String),
-    /// A cstring, e.g c"Hello world!\00"
+    Register(Register),
+    /// A raw string, e.g c"Hello world!\00"
     CString(String),
+    /// Represents a constant value
+    Constant(Constant)
+}
 
-    /// Represents a parameter that is not captured
-    NoCapture,
-
+#[derive(Clone, Debug)]
+pub enum Constant {
     /// Represents an i1 'true'.
     True,
     /// Represents an i1 'false'.
@@ -102,4 +104,15 @@ pub enum Value {
     /// This constant computes the address of the specified basic block in the specified function.
     /// Taking the address of the entry block is illegal.
     BlockAddress(String, String)
+}
+
+
+#[derive(Clone, Debug)]
+pub struct GlobalPtr {
+    pub name: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct Register {
+    pub name: String
 }
