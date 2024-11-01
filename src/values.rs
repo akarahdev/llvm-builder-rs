@@ -1,3 +1,5 @@
+use crate::blocks::BasicBlock;
+
 pub enum Type {
     /// The integer type is a very simple type that simply specifies an arbitrary bit width for the
     /// integer type desired. Any bit width from 1 bit to 223(about 8 million) can be specified.
@@ -84,5 +86,18 @@ pub enum Value {
     /// Represents an array constant.
     ArrayConstant(Vec<(Type, Value)>),
     /// Represents an vector constant.
-    VectorConstant(Vec<(Type, Value)>)
+    VectorConstant(Vec<(Type, Value)>),
+
+    /// A poison value is a result of an erroneous operation.
+    /// Most instructions return ‘poison’ when one of their arguments is ‘poison’.
+    /// It is correct to replace a poison value with an undef value or any value of the type.
+    Poison,
+    /// Indicates that the user of the value may receive an unspecified bit-pattern.
+    /// Undefined values may be of any type (other than ‘label’ or ‘void’) and be used anywhere a
+    /// constant is permitted.
+    Undef,
+
+    /// This constant computes the address of the specified basic block in the specified function.
+    /// Taking the address of the entry block is illegal.
+    BlockAddress(String, String)
 }
