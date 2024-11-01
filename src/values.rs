@@ -1,5 +1,6 @@
 use crate::blocks::BasicBlock;
 
+#[derive(Clone, Debug)]
 pub enum Type {
     /// The integer type is a very simple type that simply specifies an arbitrary bit width for the
     /// integer type desired. Any bit width from 1 bit to 223(about 8 million) can be specified.
@@ -54,6 +55,7 @@ pub enum Type {
     Opaque
 }
 
+#[derive(Clone, Debug)]
 pub enum Value {
     /// A global value, e.g @main
     GlobalVariable(String),
