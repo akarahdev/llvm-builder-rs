@@ -5,6 +5,7 @@ struct Module {
     functions: Vec<Function>
 }
 
+#[derive(Eq, Hash, Clone, PartialEq, Debug)]
 pub enum LinkageType {
     Private,
     Internal,
@@ -19,6 +20,7 @@ pub enum LinkageType {
     External
 }
 
+#[derive(Eq, Hash, Clone, PartialEq, Debug)]
 pub enum CallingConvention {
     C,
     Fast,
